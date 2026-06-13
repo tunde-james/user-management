@@ -4,6 +4,7 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,11 +20,14 @@ import com.example.usermanagement.exception.UserAlreadyExistsException;
 import com.example.usermanagement.exception.UserNotFoundException;
 import com.example.usermanagement.mapper.UserMapper;
 import com.example.usermanagement.repository.UserRepository;
+import com.example.usermanagement.security.CustomUserDetails;
+import com.example.usermanagement.security.JwtService;
 
 @Service
 public class AuthService {
 
     private final UserRepository userRepository;
+    private final JwtService jwtService;
     private final JwtProperties jwtProperties;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
@@ -31,11 +35,13 @@ public class AuthService {
 
     public AuthService(
             UserRepository userRepository,
+            JwtService jwtService,
             JwtProperties jwtProperties,
             PasswordEncoder passwordEncoder,
             AuthenticationManager authenticationManager,
             UserMapper userMapper) {
         this.userRepository = userRepository;
+        this.jwtService = jwtService;
         this.jwtProperties = jwtProperties;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
@@ -60,7 +66,8 @@ public class AuthService {
 
         User savedUser = userRepository.save(user);
 
-        String token = jwtService.generateToken(savedUser);
+        CustomUserDetails userDetails = new CustomUserDetails(savedUser);
+        String token = jwtService.generateToken(userDetails);
 
         return new RegisterResDto(
                 savedUser.getId(),
@@ -77,7 +84,9 @@ public class AuthService {
         Authentication auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(reqDto.usernameOrEmail(), reqDto.password()));
 
-        String token = jwtService.generateToken(auth);
+        UserDetails userDetails = (UserDetails) auth.getPrincipal();
+
+        String token = jwtService.generateToken(userDetails);
 
         return new LoginResDto(token, "Bearer", jwtProperties.getExpiresIn().toSeconds());
     }

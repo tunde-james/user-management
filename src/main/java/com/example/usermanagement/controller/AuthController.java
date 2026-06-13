@@ -28,7 +28,6 @@ public class AuthController {
 
     public AuthController(AuthService authService) {
         this.authService = authService;
-
     }
 
     @PostMapping("/register")
@@ -40,13 +39,15 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResDto> login(@Valid @RequestBody LoginReqDto reqDto){
+    public ResponseEntity<LoginResDto> login(@Valid @RequestBody LoginReqDto reqDto) {
 
         LoginResDto response = authService.login(reqDto);
 
         ResponseCookie cookie = authService.buildAuthCookie(response.accessToken());
 
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).build();
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .build();
     }
 
     @PostMapping("/login/mobile")
@@ -60,14 +61,16 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<Void> logout() {
 
-        ResponseCookie expiredCookie = authService.clearAuthCookie()
+        ResponseCookie expiredCookie = authService.clearAuthCookie();
 
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, expiredCookie.toString()).build();
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, expiredCookie.toString())
+                .build();
     }
 
     @GetMapping("/me")
     public ResponseEntity<UserResDto> getAuthenticatedUser(Authentication authentication) {
-         
+
         UserResDto user = authService.getAuthenticatedUser(authentication.getName());
 
         return ResponseEntity.ok().body(user);
