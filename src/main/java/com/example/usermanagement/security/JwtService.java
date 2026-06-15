@@ -8,6 +8,7 @@ import java.util.function.Function;
 import javax.crypto.SecretKey;
 
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -16,13 +17,16 @@ import io.jsonwebtoken.security.Keys;
 
 import com.example.usermanagement.config.JwtProperties;
 
+@Service
 public class JwtService {
 
     private final JwtProperties jwtProperties;
+    private final TokenBlocklistService tokenBlocklistService;
     private SecretKey signinKey;
 
-    public JwtService(JwtProperties jwtProperties) {
+    public JwtService(JwtProperties jwtProperties, TokenBlocklistService tokenBlocklistService) {
         this.jwtProperties = jwtProperties;
+        this.tokenBlocklistService = tokenBlocklistService;
         this.signinKey = deriveKey(jwtProperties.getSecret());
     }
 
@@ -52,6 +56,9 @@ public class JwtService {
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
 
+        if (tokenBlocklistService.isRevoked(token)) {
+            return false;
+        }
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }

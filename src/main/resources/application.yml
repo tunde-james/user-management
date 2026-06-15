@@ -1,7 +1,6 @@
 spring: 
   application:
     name: usermanagement
-
   app:
     jwt:
       secret: ${JWT_SECRET:change-this-to-a-long-random-secret-at-least-32-characters}

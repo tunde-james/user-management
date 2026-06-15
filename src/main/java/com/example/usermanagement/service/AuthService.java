@@ -22,6 +22,7 @@ import com.example.usermanagement.mapper.UserMapper;
 import com.example.usermanagement.repository.UserRepository;
 import com.example.usermanagement.security.CustomUserDetails;
 import com.example.usermanagement.security.JwtService;
+import com.example.usermanagement.security.TokenBlocklistService;
 
 @Service
 public class AuthService {
@@ -32,6 +33,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final UserMapper userMapper;
+    private final TokenBlocklistService tokenBlocklistService;
 
     public AuthService(
             UserRepository userRepository,
@@ -39,13 +41,15 @@ public class AuthService {
             JwtProperties jwtProperties,
             PasswordEncoder passwordEncoder,
             AuthenticationManager authenticationManager,
-            UserMapper userMapper) {
+            UserMapper userMapper,
+            TokenBlocklistService tokenBlocklistService) {
         this.userRepository = userRepository;
         this.jwtService = jwtService;
         this.jwtProperties = jwtProperties;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.userMapper = userMapper;
+        this.tokenBlocklistService = tokenBlocklistService;
     }
 
     public RegisterResDto register(RegisterReqDto reqDto) {
@@ -100,6 +104,20 @@ public class AuthService {
                 .maxAge(jwtProperties.getExpiresIn().toSeconds())
                 .sameSite("Strict")
                 .build();
+    }
+
+    /**
+     * Revokes the supplied JWT so it cannot be reused, then returns an expired
+     * cookie to clear it from the browser. Passing {@code null} or a blank token
+     * is safe — revocation is simply skipped.
+     */
+    public ResponseCookie logout(String token) {
+
+        if (token != null && !token.isBlank()) {
+            tokenBlocklistService.revoke(token);
+        }
+
+        return clearAuthCookie();
     }
 
     public ResponseCookie clearAuthCookie() {

@@ -71,7 +71,7 @@ public class UserService {
                 .findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + id));
 
-        if (userRepository.existsByEmailAndUsernameAndIdNot(reqDto.email(), id)) {
+        if (userRepository.existsByEmailAndIdNot(reqDto.email(), id)) {
             throw new UserAlreadyExistsException("A user with this email or username already exists.");
         }
 

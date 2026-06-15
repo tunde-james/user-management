@@ -20,11 +20,17 @@ public interface UserMapper {
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "role", ignore = true)
     @Mapping(target = "active", ignore = true)
+    @Mapping(target = "expired", ignore = true)
+    @Mapping(target = "locked", ignore = true)
+    @Mapping(target = "credentialsExpired", ignore = true)
     User toEntity(RegisterReqDto req);
 
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "role", ignore = true)
     @Mapping(target = "active", ignore = true)
+    @Mapping(target = "expired", ignore = true)
+    @Mapping(target = "locked", ignore = true)
+    @Mapping(target = "credentialsExpired", ignore = true)
     User toEntity(UserReqDto req);
 
     UserResDto toDto(User user);
@@ -35,5 +41,8 @@ public interface UserMapper {
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "role", ignore = true)
     @Mapping(target = "active", ignore = true)
+    @Mapping(target = "expired", ignore = true)
+    @Mapping(target = "locked", ignore = true)
+    @Mapping(target = "credentialsExpired", ignore = true)
     void updateEntityFromDto(UserUpdateReqDto req, @MappingTarget User user);
 }

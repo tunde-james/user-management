@@ -1,5 +1,7 @@
 package com.example.usermanagement.controller;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpHeaders;
@@ -58,21 +60,31 @@ public class AuthController {
         return ResponseEntity.ok().body(response);
     }
 
-    @PostMapping("/logout")
-    public ResponseEntity<Void> logout() {
-
-        ResponseCookie expiredCookie = authService.clearAuthCookie();
-
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, expiredCookie.toString())
-                .build();
-    }
-
     @GetMapping("/me")
     public ResponseEntity<UserResDto> getAuthenticatedUser(Authentication authentication) {
 
         UserResDto user = authService.getAuthenticatedUser(authentication.getName());
 
         return ResponseEntity.ok().body(user);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(HttpServletRequest request) {
+
+        String token = null;
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("JWT".equals(cookie.getName())) {
+                    token = cookie.getValue();
+                    break;
+                }
+            }
+        }
+
+        ResponseCookie expiredCookie = authService.logout(token);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, expiredCookie.toString())
+                .build();
     }
 }

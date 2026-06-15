@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:usermanagement
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+  flyway:
+    enabled: false
+
+app:
+  jwt:
+    secret: p+wHErF485AhAA1Igtecljk66S18dCnD1tGKPNiqVCw=
+    issuer: test-usermanagement
+    expires-in: 1h
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE

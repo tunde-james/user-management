@@ -38,4 +38,13 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRole role;
+
+    @Column(name = "is_expired", nullable = false)
+    private boolean expired = false;
+
+    @Column(name = "is_locked", nullable = false)
+    private boolean locked = false;
+
+    @Column(name = "is_credentials_expired", nullable = false)
+    private boolean credentialsExpired = false;
 }
