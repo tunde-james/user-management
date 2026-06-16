@@ -10,6 +10,7 @@ public record UserReqDto(
         String username,
 
         @NotBlank(message = "Email is required")
+        @Size(max = 100, message = "Email cannot exceed 100 characters")
         @Email(
                 regexp = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$",
                 message = "Please provide a valid email address")

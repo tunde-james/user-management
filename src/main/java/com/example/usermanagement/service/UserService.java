@@ -45,11 +45,12 @@ public class UserService {
     public UserResDto getUserByUsername(String username) {
 
         if (username == null) {
-            throw new IllegalArgumentException("Username cannot be null");
+            throw new IllegalArgumentException("User ID cannot be null");
         }
 
-        User user =
-                userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found"));
+        User user = userRepository
+                .findByUsernameIgnoreCase(username)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         return userMapper.toDto(user);
     }
@@ -92,7 +93,7 @@ public class UserService {
                 .findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + id));
 
-        if (passwordEncoder.matches(user.getPassword(), reqDto.currentPassword())) {
+        if (passwordEncoder.matches(reqDto.currentPassword(), user.getPassword())) {
             throw new InvalidPasswordException("Current password is incorrect");
         }
 

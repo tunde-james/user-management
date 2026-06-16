@@ -1,7 +1,5 @@
 package com.example.usermanagement.controller;
 
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpHeaders;
@@ -9,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -49,7 +48,7 @@ public class AuthController {
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .build();
+                .body(response);
     }
 
     @PostMapping("/login/mobile")
@@ -68,20 +67,30 @@ public class AuthController {
         return ResponseEntity.ok().body(user);
     }
 
+    // @PostMapping("/logout")
+    // public ResponseEntity<Void> logout(HttpServletRequest request) {
+
+    //     String token = null;
+    //     if (request.getCookies() != null) {
+    //         for (Cookie cookie : request.getCookies()) {
+    //             if ("JWT".equals(cookie.getName())) {
+    //                 token = cookie.getValue();
+    //                 break;
+    //             }
+    //         }
+    //     }
+
+    //     ResponseCookie expiredCookie = authService.logout(token);
+
+    //     return ResponseEntity.ok()
+    //             .header(HttpHeaders.SET_COOKIE, expiredCookie.toString())
+    //             .build();
+    // }
+
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(HttpServletRequest request) {
+    public ResponseEntity<Void> logout(@CookieValue(value = "JWT", required = false) String jwtToken) {
 
-        String token = null;
-        if (request.getCookies() != null) {
-            for (Cookie cookie : request.getCookies()) {
-                if ("JWT".equals(cookie.getName())) {
-                    token = cookie.getValue();
-                    break;
-                }
-            }
-        }
-
-        ResponseCookie expiredCookie = authService.logout(token);
+        ResponseCookie expiredCookie = authService.logout(jwtToken);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, expiredCookie.toString())

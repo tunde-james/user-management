@@ -28,7 +28,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/id/{id}")
     public ResponseEntity<UserResDto> getUserById(@PathVariable Long id) {
 
         UserResDto user = userService.getUserById(id);
@@ -36,7 +36,7 @@ public class UserController {
         return ResponseEntity.ok().body(user);
     }
 
-    @GetMapping("/{username}")
+    @GetMapping("/username/{username}")
     public ResponseEntity<UserResDto> getUserByUsername(@PathVariable String username) {
 
         UserResDto user = userService.getUserByUsername(username);

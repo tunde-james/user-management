@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -43,6 +44,7 @@ public class JwtService {
         return Jwts.builder()
                 .claims(extraClaims)
                 .subject(userDetails.getUsername())
+                .issuer(jwtProperties.getIssuer())
                 .issuedAt(now)
                 .expiration(expiration)
                 .signWith(signinKey, io.jsonwebtoken.Jwts.SIG.HS256)
@@ -54,13 +56,14 @@ public class JwtService {
         return extractClaim(token, Claims::getSubject);
     }
 
-    public boolean isTokenValid(String token, UserDetails userDetails) {
+    public boolean isTokenValid(String jwt, UserDetails userDetails) {
 
-        if (tokenBlocklistService.isRevoked(token)) {
+        try {
+            final String username = extractUsername(jwt);
+            return username.equals(userDetails.getUsername()) && !isTokenExpired(jwt);
+        } catch (JwtException e) {
             return false;
         }
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }
 
     private SecretKey deriveKey(String secret) {

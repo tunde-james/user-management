@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 
 public final class ApiProblemDetails {
 
-    private static final String PROBLEM_BASE_URL = "https://moviebookingapp/problems";
+    private static final String PROBLEM_BASE_URL = "https://usermanagement/problems";
 
     private ApiProblemDetails() {}
 
@@ -21,7 +21,6 @@ public final class ApiProblemDetails {
                 .body(problemDetail);
     }
 
-    
     public static ProblemDetail validationError(String instance, List<FieldErrorDetail> errors) {
 
         ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
@@ -35,7 +34,6 @@ public final class ApiProblemDetails {
         return problemDetail;
     }
 
-
     public static ProblemDetail conflict(String instance, String type, String title, String detail) {
 
         ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.CONFLICT);
@@ -47,7 +45,6 @@ public final class ApiProblemDetails {
 
         return problemDetail;
     }
-
 
     public static ProblemDetail notFound(String instance, String type, String title, String detail) {
 
@@ -76,7 +73,7 @@ public final class ApiProblemDetails {
     public static ProblemDetail unauthorized(String uri, String errorCode, String title, String detail) {
 
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, detail);
-        problemDetail.setType(URI.create("https://moviebookingapp/problems/" + errorCode));
+        problemDetail.setType(URI.create(PROBLEM_BASE_URL + "/" + errorCode));
         problemDetail.setTitle(title);
         problemDetail.setInstance(URI.create(uri));
 

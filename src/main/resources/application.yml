@@ -1,8 +1,9 @@
 spring: 
   application:
     name: usermanagement
-  app:
-    jwt:
-      secret: ${JWT_SECRET:change-this-to-a-long-random-secret-at-least-32-characters}
-      issuer: ${JWT_ISSUER:usermanagement}
-      expires-in: ${JWT_EXPIRES_IN:1h}
+    
+app:
+  jwt:
+    secret: ${JWT_SECRET}
+    issuer: ${JWT_ISSUER:usermanagement}
+    expires-in: ${JWT_EXPIRES_IN:1h}

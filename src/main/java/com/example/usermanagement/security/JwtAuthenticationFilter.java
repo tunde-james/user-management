@@ -16,15 +16,22 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import io.jsonwebtoken.JwtException;
+
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final CustomUserDetailsService userDetailsService;
+    private final TokenBlocklistService tokenBlocklistService;
 
-    public JwtAuthenticationFilter(JwtService jwtService, CustomUserDetailsService userDetailsService) {
+    public JwtAuthenticationFilter(
+            JwtService jwtService,
+            CustomUserDetailsService userDetailsService,
+            TokenBlocklistService tokenBlocklistService) {
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
+        this.tokenBlocklistService = tokenBlocklistService;
     }
 
     @Override
@@ -38,22 +45,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        final String username = jwtService.extractUsername(jwt);
+        try {
 
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            final String username = jwtService.extractUsername(jwt);
 
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            if (jwtService.isTokenValid(jwt, userDetails)) {
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                if (jwtService.isTokenValid(jwt, userDetails)) {
 
-                SecurityContext context = SecurityContextHolder.createEmptyContext();
-                context.setAuthentication(authToken);
-                SecurityContextHolder.setContext(context);
+                    if (tokenBlocklistService.isRevoked(jwt)) {
+                        filterChain.doFilter(request, response);
+                        return;
+                    }
+
+                    UsernamePasswordAuthenticationToken authToken =
+                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                    SecurityContext context = SecurityContextHolder.createEmptyContext();
+                    context.setAuthentication(authToken);
+                    SecurityContextHolder.setContext(context);
+                }
             }
+        } catch (JwtException e) {
+            logger.debug("JWT processing failed: " + e.getMessage());
         }
 
         filterChain.doFilter(request, response);

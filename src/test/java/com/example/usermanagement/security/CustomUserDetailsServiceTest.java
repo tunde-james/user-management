@@ -36,7 +36,7 @@ class CustomUserDetailsServiceTest {
         user.setActive(true);
         user.setRole(UserRole.ROLE_USER);
 
-        when(userRepository.findByUsername("john")).thenReturn(Optional.of(user));
+        when(userRepository.findByUsernameIgnoreCase("john")).thenReturn(Optional.of(user));
 
         UserDetails result = underTest.loadUserByUsername("john");
 
@@ -54,8 +54,8 @@ class CustomUserDetailsServiceTest {
         user.setActive(true);
         user.setRole(UserRole.ROLE_USER);
 
-        when(userRepository.findByUsername("john@example.com")).thenReturn(Optional.empty());
-        when(userRepository.findByEmail("john@example.com")).thenReturn(Optional.of(user));
+        when(userRepository.findByUsernameIgnoreCase("john@example.com")).thenReturn(Optional.empty());
+        when(userRepository.findByEmailIgnoreCase("john@example.com")).thenReturn(Optional.of(user));
 
         UserDetails result = underTest.loadUserByUsername("john@example.com");
 

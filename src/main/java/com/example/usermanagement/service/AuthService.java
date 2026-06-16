@@ -134,7 +134,7 @@ public class AuthService {
     public UserResDto getAuthenticatedUser(String username) {
 
         User user =
-                userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found"));
+                userRepository.findByUsernameIgnoreCase(username).orElseThrow(() -> new UserNotFoundException("User not found"));
 
         return userMapper.toDto(user);
     }
