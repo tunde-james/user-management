@@ -67,26 +67,6 @@ public class AuthController {
         return ResponseEntity.ok().body(user);
     }
 
-    // @PostMapping("/logout")
-    // public ResponseEntity<Void> logout(HttpServletRequest request) {
-
-    //     String token = null;
-    //     if (request.getCookies() != null) {
-    //         for (Cookie cookie : request.getCookies()) {
-    //             if ("JWT".equals(cookie.getName())) {
-    //                 token = cookie.getValue();
-    //                 break;
-    //             }
-    //         }
-    //     }
-
-    //     ResponseCookie expiredCookie = authService.logout(token);
-
-    //     return ResponseEntity.ok()
-    //             .header(HttpHeaders.SET_COOKIE, expiredCookie.toString())
-    //             .build();
-    // }
-
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@CookieValue(value = "JWT", required = false) String jwtToken) {
 
